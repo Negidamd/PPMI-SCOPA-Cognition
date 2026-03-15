@@ -1,0 +1,12 @@
+# Data files (PPMI data requires DUA)
+data/*.csv
+*.csv
+
+# OS
+.DS_Store
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
