@@ -1,68 +1,100 @@
 # SCOPA-AUT Items Predicting Cognitive Milestones in Parkinson's Disease
 
-Analysis code for the study: **"Baseline Autonomic Symptoms Predict Cognitive Milestones in Parkinson's Disease: An Item-Level Analysis of SCOPA-AUT in the PPMI"**
+Analysis code for **"Baseline Autonomic Symptoms Predict Cognitive Milestones in Parkinson's Disease: An Item-Level Analysis of SCOPA-AUT in the PPMI"** — currently under revision (R1) at *Clinical Autonomic Research* (Springer; ms ID AUTR-D-26-00087).
 
-## Study Summary
+> **Branch status.** The `main` branch contains the v0 analysis from the original submission. This `r1-revision` branch contains the expanded R1 pipeline. The two will be merged into `main` upon paper acceptance.
 
-This study examines which individual SCOPA-AUT (Scales for Outcomes in Parkinson's Disease — Autonomic) items at baseline predict subsequent cognitive milestones in Parkinson's disease, using the Parkinson's Progression Markers Initiative (PPMI) dataset.
+---
 
-- **Cohort:** 960 de novo PD patients with baseline SCOPA-AUT and ≥2 years follow-up
-- **Outcome:** Composite cognitive milestone (MoCA <21, investigator-diagnosed dementia, PD-Dementia per MDS criteria, UPDRS-I cognitive/hallucination/apathy items)
-- **Primary analysis:** Item-level Cox proportional hazards models, adjusted for age, sex, education, baseline MoCA, and MDS-UPDRS Part III
-- **Key finding:** 8 of 25 SCOPA-AUT items independently predicted cognitive milestones after FDR correction
+## Study summary (R1 revision)
+
+| | |
+|---|---|
+| Data freeze | PPMI v2.1 (22 April 2026) |
+| Analytical cohort | **N = 1,129** de novo PD patients with baseline SCOPA-AUT and ≥ 1 follow-up visit |
+| Outcome | Composite cognitive milestone m10–m15 per Brumm et al. 2023 (MoCA < 21; investigator dementia; PD-D per MDS criteria; UPDRS-I cognitive / hallucination items) |
+| Events | **279** composite events (24.7 %) over median 3.0 y follow-up |
+| Primary analysis | Item-level Cox PH, two adjustment sets (Model A: 5 covariates; Model B: 12 covariates with LEDD, Schwab–England, RBDSQ, disease duration, α-blocker, antihypertensive, Hoehn–Yahr) |
+| Multiple testing | Benjamini–Hochberg FDR over 25 items / 4 domains / 6 milestones |
+| Sensitivity analyses | SAA+ subgroup (N = 921); Fine-Gray competing risks (35 / 79 deaths preceded a milestone); LASSO Cox (10-fold CV selection frequency); subset-sufficiency analysis |
+| Discrimination | Harrell's *C*, time-dependent AUC at 4 y and 6 y, integrated Brier score; 10-fold CV |
+| Key finding | 5 of 21 fully-available items survive FDR correction under Model B (dysphagia, early satiety, lightheadedness on standing, lightheadedness on walking, cold intolerance); domain-level (GI, cardiovascular, thermoregulatory) and subset-sufficient signals replicate the result |
+
+---
 
 ## Data
 
-This analysis uses the [PPMI dataset](https://www.ppmi-info.org/). Data access requires registration and approval from PPMI. The scripts expect:
-- `../PPMI_Master_Merged.csv` — the merged PPMI master dataset (not included; see PPMI data portal)
+This analysis uses the [PPMI dataset](https://www.ppmi-info.org/). Data access requires registration and approval from PPMI; raw data **are not** included in this repository.
 
-## Scripts
+Scripts expect the merged PPMI master at `data/PPMI_Master_Merged_2026-04-22.csv` (the 22 April 2026 freeze; v2.1). `00_inspect_data.py` documents the columns the pipeline expects.
 
-Run scripts in numerical order:
+---
 
-| Script | Description |
-|--------|-------------|
-| `scripts/00_build_cohort.py` | Builds the analytical cohort (N=960) with inclusion/exclusion criteria, defines outcomes and time-to-event variables |
-| `scripts/01_table1.py` | Generates Table 1: baseline characteristics by cognitive milestone status |
-| `scripts/02_primary_analysis.py` | Primary analysis: item-level and domain-level Cox PH and logistic regression |
-| `scripts/03_sensitivity.py` | Sensitivity analyses: 4-year follow-up cutoff, individual milestones, attrition bias |
-| `scripts/04_figures.py` | Generates all figures: flow diagram, forest plots, Kaplan-Meier curves, sensitivity heatmap |
-
-## Requirements
+## Pipeline — run scripts in numerical order
 
 ```
+00_inspect_data.py                          # column inventory + sanity checks
+01_build_cohort_R1.py                       # inclusion/exclusion, m10–m15 events, locked analytical_dataset_R1.csv
+02_primary_analysis_R1.py                   # item-level Cox (Model A + Model B), Schoenfeld PH, LR vs total
+03_per_milestone_and_pure_cog_R1.py         # per-milestone item-level Cox (m10–m15) + pure-cog / pure-NP sub-composites
+04_lasso_and_discrimination_R1.py           # LASSO Cox selection frequency + nested-model discrimination (C, AUC, IBS)
+05_finegray_saa_calibration_R1.py           # Fine-Gray competing risks + SAA+ stratification + calibration
+06_build_figures_R1.py                      # 11 publication figures (matplotlib; PDF + PNG + SVG)
+07_build_tables_R1.py                       # .docx tables, three-line CLAUDE.md format
+12_subset_sufficiency_R1.py                 # iterative subset-sufficiency Cox sweep
+13_build_table6_R1.py                       # subset-sufficiency table
+14_finalize_tables_for_CAR.py               # post-CAR-triage table renumbering + caption rewrite
+16_recompute_discrimination_full_metrics.py # AUC + Brier for the 6 prognostic models (companion to 04)
+```
+
+Manuscript & submission-package builders (not strictly analytical, but reproduce the submitted Word files):
+
+```
+08_build_manuscript_R1.py                   # initial python-docx manuscript build
+09_build_tracked_changes_R1.py              # tracked-changes (w:ins/w:del) Word version
+10_build_response_letter_R1.py              # point-by-point response letter
+11_surgical_rebuild_R1.py                   # EDITS-dict surgical patches + citation + CAR-triage renumbering
+15_assemble_submission_package.py           # copies + renames files into /revised_to_submit/
+```
+
+---
+
+## Environment
+
+```bash
 pip install -r requirements.txt
 ```
 
-## Output Structure
+Python ≥ 3.9. Tested on 3.9 and 3.11.
 
-```
-├── data/
-│   ├── analytical_dataset.csv      # Locked analytical dataset (N=960)
-│   └── analytical_dataset_4y.csv   # 4-year minimum follow-up subset
-├── tables/
-│   ├── table1.csv
-│   ├── cox_univariable.csv
-│   ├── cox_adjusted.csv
-│   ├── logistic_univariable.csv
-│   ├── logistic_adjusted.csv
-│   ├── cox_domain_adjusted.csv
-│   └── sensitivity_*.csv
-├── figures/
-│   ├── figure1_flowchart.png/pdf
-│   ├── figure2_forest_cox.png/pdf
-│   ├── figure3_km_tertiles.png/pdf
-│   ├── figure4_domain_forest.png/pdf
-│   └── figure5_sensitivity_heatmap.png/pdf
-└── logs/
-    ├── exclusion_log.csv
-    └── exclusion_log.md
-```
+---
+
+## Reproducibility notes
+
+- **Locked analytical dataset.** Step `01_build_cohort_R1.py` produces `data/analytical_dataset_R1.csv`. All downstream scripts read **only** from that file. No script reloads raw PPMI tables once the analytical dataset is locked.
+- **Seed.** `np.random.seed(42)` and `KFold(random_state=42)` everywhere CV occurs.
+- **Workflow log.** Every patient-filter step, variable choice, and analytical decision is documented in `manuscript/Workflow_Decisions.docx` (not in this repo — it lives with the manuscript).
+- **No silent data drift.** The R1 cohort (Apr 2026 freeze, N = 1,129) differs from the original submission (Jan 2026 freeze, N = 960). The change is disclosed in the manuscript Methods and response letter.
+
+---
 
 ## Citation
 
-Negida A. Baseline Autonomic Symptoms Predict Cognitive Milestones in Parkinson's Disease: An Item-Level Analysis of SCOPA-AUT in the PPMI. *Clinical Autonomic Research*. 2025.
+If you use code from this repository, please cite:
+
+> Negida A. *Baseline autonomic symptoms predict cognitive milestones in Parkinson's disease: an item-level analysis of SCOPA-AUT in the PPMI.* (Under revision, *Clinical Autonomic Research*, 2026.)
+
+PPMI data citation per the [PPMI Data Use Agreement](https://www.ppmi-info.org/access-data-specimens/download-data).
+
+---
 
 ## License
 
-This code is provided for research reproducibility. PPMI data is subject to its own data use agreement.
+MIT — see `LICENSE`.
+
+---
+
+## Contact
+
+Ahmed Negida, MD, PhD — Parkinson and Movement Disorder Center, Department of Neurology, Virginia Commonwealth University
+[ahmed.negida@vcuhealth.org](mailto:ahmed.negida@vcuhealth.org) · ORCID [0000-0001-5363-6369](https://orcid.org/0000-0001-5363-6369) · [negidamd.github.io](https://negidamd.github.io/)

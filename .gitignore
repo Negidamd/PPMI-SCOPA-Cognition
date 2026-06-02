@@ -10,3 +10,17 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Manuscript build artifacts (paper-side, regenerated from scripts)
+manuscript/
+figures/
+tables/
+revised_to_submit/
+cover_letter/*.docx
+response_to_reviewers/*.docx
+logs/
+
+# Backups
+*.bak
+*.bak_*
+~$*

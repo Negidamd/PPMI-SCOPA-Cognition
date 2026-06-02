@@ -1,7 +1,18 @@
+# Core
 pandas>=1.5
 numpy>=1.23
 scipy>=1.9
+
+# Statistics
 statsmodels>=0.13
 lifelines>=0.27
+scikit-learn>=1.2
+scikit-survival>=0.21      # sksurv: CoxPH, time-dep AUC, IBS
+
+# Visualization
 matplotlib>=3.6
 seaborn>=0.12
+
+# Manuscript / table generation
+python-docx>=0.8.11        # .docx builders (Tables 1–5 + Supp + manuscript)
+lxml>=4.9                  # underlying XML manipulation for tracked changes
