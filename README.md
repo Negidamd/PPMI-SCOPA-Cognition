@@ -39,23 +39,14 @@ Scripts expect the merged PPMI master at `data/PPMI_Master_Merged_2026-04-22.csv
 03_per_milestone_and_pure_cog_R1.py         # per-milestone item-level Cox (m10–m15) + pure-cog / pure-NP sub-composites
 04_lasso_and_discrimination_R1.py           # LASSO Cox selection frequency + nested-model discrimination (C, AUC, IBS)
 05_finegray_saa_calibration_R1.py           # Fine-Gray competing risks + SAA+ stratification + calibration
-06_build_figures_R1.py                      # 11 publication figures (matplotlib; PDF + PNG + SVG)
-07_build_tables_R1.py                       # .docx tables, three-line CLAUDE.md format
+06_build_figures_R1.py                      # publication figures (matplotlib; PDF + PNG + SVG)
+07_build_tables_R1.py                       # analytical tables exported as Word .docx
 12_subset_sufficiency_R1.py                 # iterative subset-sufficiency Cox sweep
 13_build_table6_R1.py                       # subset-sufficiency table
-14_finalize_tables_for_CAR.py               # post-CAR-triage table renumbering + caption rewrite
 16_recompute_discrimination_full_metrics.py # AUC + Brier for the 6 prognostic models (companion to 04)
 ```
 
-Manuscript & submission-package builders (not strictly analytical, but reproduce the submitted Word files):
-
-```
-08_build_manuscript_R1.py                   # initial python-docx manuscript build
-09_build_tracked_changes_R1.py              # tracked-changes (w:ins/w:del) Word version
-10_build_response_letter_R1.py              # point-by-point response letter
-11_surgical_rebuild_R1.py                   # EDITS-dict surgical patches + citation + CAR-triage renumbering
-15_assemble_submission_package.py           # copies + renames files into /revised_to_submit/
-```
+> This repository contains **analysis code only**. Manuscript assembly, tracked-changes rendering, response-letter generation, and journal-format triage are author-side build glue and are intentionally not included here.
 
 ---
 
