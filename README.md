@@ -1,68 +1,47 @@
-# SCOPA-AUT Items Predicting Cognitive Milestones in Parkinson's Disease
+# SCOPA-AUT items and cognition milestones in Parkinson's disease
 
-Analysis code for the study: **"Baseline Autonomic Symptoms Predict Cognitive Milestones in Parkinson's Disease: An Item-Level Analysis of SCOPA-AUT in the PPMI"**
+Analysis code for **"Baseline Autonomic Symptoms and Cognitive Progression Milestones in Parkinson's Disease: An Item-Level SCOPA-AUT Analysis"**, a longitudinal cohort study in the Parkinson's Progression Markers Initiative (PPMI).
 
-## Study Summary
+This code replaces the code for the preprint (doi:10.21203/rs.3.rs-9129721/v1). Do not use the preprint code or its results. The rebuild corrects the SCOPA-AUT item labels and domains, the timing of baseline levodopa equivalent daily dose, the time scale after year 5, the event times for individual milestones, the competing-risk model, and the exclusion of participants who answered "not applicable" to sexual items. The preprint code is kept at tag `preprint-v1`.
 
-This study examines which individual SCOPA-AUT (Scales for Outcomes in Parkinson's Disease — Autonomic) items at baseline predict subsequent cognitive milestones in Parkinson's disease, using the Parkinson's Progression Markers Initiative (PPMI) dataset.
-
-- **Cohort:** 960 de novo PD patients with baseline SCOPA-AUT and ≥2 years follow-up
-- **Outcome:** Composite cognitive milestone (MoCA <21, investigator-diagnosed dementia, PD-Dementia per MDS criteria, UPDRS-I cognitive/hallucination/apathy items)
-- **Primary analysis:** Item-level Cox proportional hazards models, adjusted for age, sex, education, baseline MoCA, and MDS-UPDRS Part III
-- **Key finding:** 8 of 25 SCOPA-AUT items independently predicted cognitive milestones after FDR correction
+The analysis plan is in [SAP.md](SAP.md). It was written after an audit of the earlier versions and is not blind to their results. Departures from it are listed in the manuscript.
 
 ## Data
 
-This analysis uses the [PPMI dataset](https://www.ppmi-info.org/). Data access requires registration and approval from PPMI. The scripts expect:
-- `../PPMI_Master_Merged.csv` — the merged PPMI master dataset (not included; see PPMI data portal)
+No PPMI data are in this repository. Access requires approval from PPMI ([ppmi-info.org](https://www.ppmi-info.org/)).
 
-## Scripts
+Download the raw case report form files of the 22 April 2026 freeze into `data/raw/`, keeping their file names. `data/raw_manifest_sha256.txt` lists the files with SHA-256 hashes, so you can confirm you have the same freeze. No derived or merged dataset is used.
 
-Run scripts in numerical order:
+## Run order
 
-| Script | Description |
-|--------|-------------|
-| `scripts/00_build_cohort.py` | Builds the analytical cohort (N=960) with inclusion/exclusion criteria, defines outcomes and time-to-event variables |
-| `scripts/01_table1.py` | Generates Table 1: baseline characteristics by cognitive milestone status |
-| `scripts/02_primary_analysis.py` | Primary analysis: item-level and domain-level Cox PH and logistic regression |
-| `scripts/03_sensitivity.py` | Sensitivity analyses: 4-year follow-up cutoff, individual milestones, attrition bias |
-| `scripts/04_figures.py` | Generates all figures: flow diagram, forest plots, Kaplan-Meier curves, sensitivity heatmap |
-
-## Requirements
+Run from the repository root.
 
 ```
 pip install -r requirements.txt
+
+python3 scripts/00_build_cohort.py                # cohort, milestones, covariates
+CATH3=1 python3 scripts/00_build_cohort.py        # catheter sensitivity cohort
+python3 scripts/01_table1.py                      # baseline table
+python3 scripts/01b_included_vs_excluded.py       # analyzed vs no follow-up
+Rscript scripts_R/02_primary.R                    # item, domain and total models
+python3 scripts/03_verify_lifelines.py            # refit in a second implementation
+Rscript scripts_R/03_sensitivity.R                # sensitivity analyses
+Rscript scripts_R/05_descriptive_curves.R         # cumulative incidence, attrition
+Rscript scripts_R/07_posthoc.R                    # post hoc checks
+Rscript scripts_R/04_prediction.R                 # cross-validated prediction
+python3 scripts/06_figures.py                     # figures
 ```
 
-## Output Structure
+Scripts stop if the cohort does not match the expected N = 1,339 and 349 primary events. Results are written to `outputs/`, `logs/`, and `figures/`. The random seed is 42.
 
-```
-├── data/
-│   ├── analytical_dataset.csv      # Locked analytical dataset (N=960)
-│   └── analytical_dataset_4y.csv   # 4-year minimum follow-up subset
-├── tables/
-│   ├── table1.csv
-│   ├── cox_univariable.csv
-│   ├── cox_adjusted.csv
-│   ├── logistic_univariable.csv
-│   ├── logistic_adjusted.csv
-│   ├── cox_domain_adjusted.csv
-│   └── sensitivity_*.csv
-├── figures/
-│   ├── figure1_flowchart.png/pdf
-│   ├── figure2_forest_cox.png/pdf
-│   ├── figure3_km_tertiles.png/pdf
-│   ├── figure4_domain_forest.png/pdf
-│   └── figure5_sensitivity_heatmap.png/pdf
-└── logs/
-    ├── exclusion_log.csv
-    └── exclusion_log.md
-```
+## Software
+
+Python 3.13 with the versions in `requirements.txt`. R 4.5.2 with survival 3.8.3, glmnet 4.1.10, timeROC 0.4.1, mice 3.19.0, and data.table 1.17.0.
 
 ## Citation
 
-Negida A. Baseline Autonomic Symptoms Predict Cognitive Milestones in Parkinson's Disease: An Item-Level Analysis of SCOPA-AUT in the PPMI. *Clinical Autonomic Research*. 2025.
+The corrected manuscript is not yet published. Until then, please cite this repository.
 
 ## License
 
-This code is provided for research reproducibility. PPMI data is subject to its own data use agreement.
+This code is provided for research reproducibility. PPMI data are subject to the PPMI data use agreement.
