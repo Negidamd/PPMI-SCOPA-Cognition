@@ -10,3 +10,11 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Generated files
+logs/*
+outputs/*
+figures/*
+!logs/.gitkeep
+!outputs/.gitkeep
+!figures/.gitkeep
